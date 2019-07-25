@@ -4,14 +4,14 @@
  * @license MIT
  */
 
-
+// 常见的立即执行函数  iife  ,一般在浏览器中运行,用于作用域隔离  
 (function (factory){
 	"use strict";
 
-	if( typeof define === "function" && define.amd ){
-		define("Sortable", [], factory);
+	if( typeof define === "function" && define.amd ){   //AMD 模式下运行 
+		define("Sortable", [], factory);  //在amd模式下, 定义模块
 	}
-	else {
+	else {											   // 浏览器普通状态下,Sortable类挂载到windows
 		window["Sortable"] = factory();
 	}
 })(function (){
@@ -39,9 +39,9 @@
 		, _silent = false
 
 		, _createEvent = function (event/**String*/, item/**HTMLElement*/){
-			var evt = document.createEvent('Event');
-			evt.initEvent(event, true, true);
-			evt.item = item;
+			var evt = document.createEvent('Event');  //创建事件 ,返回一个Event事件对象 ,此Event是MouseEvents等事件的原型.
+			evt.initEvent(event, true, true);  //初始化事件名为 event,  可以通过elem.dispatchEvent('event')触发  ,elem.addEventListener进行绑定
+			evt.item = item;// html元素
 			return evt;
 		}
 
@@ -58,7 +58,7 @@
 	 * @param  {Object}  [options]
 	 * @constructor
 	 */
-	function Sortable(el, options){
+	function Sortable(el, options){  // 一个Sortable 构造函数
 		this.el = el; // root element
 		this.options = options = (options || {});
 
@@ -66,25 +66,25 @@
 		// Defaults
 		options.group = options.group || Math.random();
 		options.handle = options.handle || null;
-		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || 'li';
-		options.ghostClass = options.ghostClass || 'sortable-ghost';
+		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || 'li';// 要拖拽的元素
+		options.ghostClass = options.ghostClass || 'sortable-ghost';  //拖拽还未放下时的 样式类
 
 		options.onAdd = _bind(this, options.onAdd || noop);
 		options.onUpdate = _bind(this, options.onUpdate || noop);
-		options.onRemove = _bind(this, options.onRemove || noop);
-
+		options.onRemove = _bind(this, options.onRemove || noop);  //此上三个是 拖拽绑定的事件
+		//_bind 不会把回调的this绑定到sortable实例,而是作为第二个参数穿进去
 
 		el[expando] = options.group;
 
 
-		// Bind all prevate methods
+		// Bind all prevate methods   先忽略
 		for( var fn in this ){
 			if( fn.charAt(0) === '_' ){
 				this[fn] = _bind(this, this[fn]);
 			}
 		}
 
-
+		//原始dom事件  给最外层的拖拽容器
 		// Bind events
 		_on(el, 'add', options.onAdd);
 		_on(el, 'update', options.onUpdate);
@@ -93,14 +93,14 @@
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 
-		_on(el, 'dragover', this._onDragOver);
+		_on(el, 'dragover', this._onDragOver); // 在其中处理 拖拽影子的添加,移动
 		_on(el, 'dragenter', this._onDragOver);
 
-		touchDragOverListeners.push(this._onDragOver);
+		touchDragOverListeners.push(this._onDragOver);  //单独又收集了一次
 	}
 
 
-	Sortable.prototype = {
+	Sortable.prototype = {// 原型
 		constructor: Sortable,
 
 
@@ -110,22 +110,23 @@
 
 
 		_onTapStart: function (evt/**TouchEvent*/){
+			console.log('_onTapStart')
 			var
 				  touch = evt.touches && evt.touches[0]
-				, target = (touch || evt).target
+				, target = (touch || evt).target //直接的item
 				, options =  this.options
-				, el = this.el
+				, el = this.el  // 整个拖拽list
 			;
 
 			if( options.handle ){
 				target = _closest(target, options.handle, el);
 			}
 
-			target = _closest(target, options.draggable, el);
+			target = _closest(target, options.draggable, el);  // 算出拖拽的item是谁 ,因为可能是制定了 draggable特定类
 
 			if( target && !dragEl && (target.parentNode === el) ){
 				tapEvt = evt;
-				target.draggable = true;
+				target.draggable = true; //设置为可拖拽
 
 
 				// Disable "draggable"
@@ -144,14 +145,16 @@
 					evt.preventDefault();
 				}
 
-
+				//此处监听的是 拖拽容器而非 item的
+				debugger
 				_on(this.el, 'dragstart', this._onDragStart);
 				_on(this.el, 'dragend', this._onDrop);
 
-				_on(document, 'dragover', _globalDragOver);
+				 
+				_on(document, 'dragover', _globalDragOver); //应该是事件冒泡到文档捕捉了这个事件,
 
 
-				try {
+				try {  //无关紧要
 					if( document.selection ){
 						document.selection.empty();
 					} else {
@@ -163,6 +166,7 @@
 
 
 		_emulateDragOver: function (){
+			 console.log('_emulateDragOver')
 			if( touchEvt ){
 				_css(ghostEl, 'display', 'none');
 
@@ -196,6 +200,7 @@
 
 
 		_onTouchMove: function (evt){
+				 console.log('_onTouchMove')
 			if( tapEvt ){
 				var
 					  touch = evt.touches[0]
@@ -210,24 +215,25 @@
 
 
 		_onDragStart: function (evt/**Event*/, isTouch){
+						 console.log('_onDragStart')
 			var
 				  target = evt.target
-				, dataTransfer = evt.dataTransfer
+				, dataTransfer = evt.dataTransfer  // 定位直接item ,与其携带的数据
 			;
 
-			rootEl = this.el;
-			dragEl = target;
-			nextEl = target.nextSibling;
-			activeGroup = this.options.group;
+			rootEl = this.el;   // 拖拽容器
+			dragEl = target;    // 拖拽的子item    //设置要被拖拽的子元素
+			nextEl = target.nextSibling;   //其后节点
+			activeGroup = this.options.group;  //所属组信息
 
-			if( isTouch ){
+			if( isTouch ){ //先不看 ,这是触摸逻辑
 				var
 					  rect = target.getBoundingClientRect()
 					, css = _css(target)
 					, ghostRect
 				;
-
-				ghostEl = target.cloneNode(true);
+				console.log('手机模式吧?')
+				ghostEl = target.cloneNode(true);  
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
@@ -246,15 +252,15 @@
 
 				// Bind touch events
 				_on(document, 'touchmove', this._onTouchMove);
-				_on(document, 'touchend', this._onDrop);
+				// _on(document, 'touchend', this._onDrop);
 
 				this._loopId = setInterval(this._emulateDragOver, 150);
 			}
 			else {
-				dataTransfer.effectAllowed = 'move';
+				dataTransfer.effectAllowed = 'move';   
 				dataTransfer.setData('Text', target.textContent);
 
-				_on(document, 'drop', this._onDrop);
+				_on(document, 'drop', this._onDrop); //给全局 设置一个 drop事件
 			}
 
 			setTimeout(this._applyEffects);
@@ -262,14 +268,16 @@
 
 
 		_onDragOver: function (evt){
+				 // console.log('_onDragOver')
 			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
+				console.log('_onDragOver', evt)
 				var
-					  el = this.el
-					, target = _closest(evt.target, this.options.draggable, el)
+					  el = this.el// 拖拽容器
+					, target = _closest(evt.target, this.options.draggable, el) //拖拽子元素中真正支持拖拽的元素
 				;
 
 				if( el.children.length === 0 || el.children[0] === ghostEl ){
-					el.appendChild(dragEl);
+					el.appendChild(dragEl); // 在start阶段就确定的 拖拽元素
 				}
 				else if( target && target !== dragEl && (target.parentNode[expando] !== void 0) ){
 					if( lastEl !== target ){
@@ -310,11 +318,11 @@
 
 
 		_onDrop: function (evt/**Event*/){
-			clearInterval(this._loopId);
-
+			clearInterval(this._loopId);//
+ 			console.log('_onDrop')
 			// Unbind events
 			_off(document, 'drop', this._onDrop);
-			_off(document, 'dragover', _globalDragOver);
+			_off(document, 'dragover', _globalDragOver);  
 
 			_off(this.el, 'dragend', this._onDrop);
 			_off(this.el, 'dragstart', this._onDragStart);
@@ -322,7 +330,7 @@
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'touchend', this._onDrop);
 
-
+			debugger
 			if( evt ){
 				evt.preventDefault();
 				evt.stopPropagation();
@@ -384,13 +392,23 @@
 			this.el = null;
 		}
 	};
+// var sum = function(x, y) {
+//    console.log(x, y);
+// }
+// var foo = Function.apply.bind(sum, null);   bind第二个参数固定了apply的第一个参数,且bind返回的是未调用的函数,所以foo([10,12])调用时,是触发了apply,
+// 这时apply的第一个参数被固定住为null,后面的数组,经过他分解后立刻执行真正的函数,而这个真正的函数是bind时绑定的sum,相当于 直接调用sum(10,20)
+// foo([10, 20]);   // 10, 20
 
+// 第二种情况
+// Function.bind.apply(…)    // 逻辑上,apply先行一步去执行bind,他先把bind的第一个参数给固定住,也就是this指向,也就是相当于他让bind执行了,只不过给bind制定了绑定对象
+// ,而apply的参数也传给了bind,  上下文是其自身, 但是this作为第二个参数传入了
+// https://blog.csdn.net/weixin_37787381/article/details/81509361
 
-	function _bind(ctx, fn){
-		var args = slice.call(arguments, 2);
-		return	fn.bind ? fn.bind.apply(fn, [ctx].concat(args)) : function (){
-			return fn.apply(ctx, args.concat(slice.call(arguments)));
-		};
+	function _bind(ctx, fn){  // this , 外部回调函数
+		var args = slice.call(arguments, 2); //截取ctx,fn
+		return	fn.bind ? fn.bind.apply(fn, [ctx].concat(args)) : function (){  //?第一个参数, 让fn预设了this,以及外部参数无需在传入额外的
+			return fn.apply(ctx, args.concat(slice.call(arguments)));// 没看懂什么操作,感觉参数重复了啊 
+		};// 
 	}
 
 
@@ -420,6 +438,7 @@
 
 
 	function _globalDragOver(evt){
+		console.log('_globalDragOver')
 		evt.dataTransfer.dropEffect = 'move';
 		evt.preventDefault();
 	}

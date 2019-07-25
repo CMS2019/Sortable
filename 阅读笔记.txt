@@ -1,0 +1,19 @@
+阅读顺序
+	Gruntfile.js  构建任务
+	最初版本,所有库的业务逻辑都在sortable.js中,grunfile的作用也只是压缩文件\
+
+
+	当拖动元素时 ,依次触发的事件
+	_onTapStart   事件触发于 拖拽容器
+	_onDragStart  事件触发于 拖拽容器(onTapStart中绑定)
+	document, 'dragover', _globalDragOver 拖拽中途 一直触发 document 的dragover,相当于文档一直作为拖拽接收方 ,好像没干啥事
+
+	_on(el, 'dragover', this._onDragOver);给自己的父容器 ,也就是拖拽容器设置为拖拽接收方,在其内进行删减影子
+
+
+总结下原理 :
+在拖拽容器的类实例中, 监听驼绒容器ul的mousedown来记录targe是哪个item或者item的子节点,设置他为可拖动,然后监听拖拽容器的dragStart,dragend,
+在tap时 ,就确定targe了
+_onDragStart开始
+	dragEl = target;  定位真正的
+

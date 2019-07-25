@@ -307,7 +307,7 @@ sort.destroy();
 					alert([].join.apply(arguments, ' '));
 				};
 			}
-
+	 
 
 			new Sortable(foo, {
 				group: "words",
@@ -338,81 +338,81 @@ sort.destroy();
 
 
 		// Background
-		document.addEventListener( "DOMContentLoaded", function (){
-			function setNoiseBackground(el, width, height, opacity){
-				var canvas = document.createElement("canvas");
-				var context = canvas.getContext("2d");
+		// document.addEventListener( "DOMContentLoaded", function (){
+		// 	function setNoiseBackground(el, width, height, opacity){
+		// 		var canvas = document.createElement("canvas");
+		// 		var context = canvas.getContext("2d");
 
-				canvas.width = width;
-				canvas.height = height;
+		// 		canvas.width = width;
+		// 		canvas.height = height;
 
-				for( var i = 0; i < width; i++ ){
-					for( var j = 0; j < height; j++ ){
-						var val = Math.floor(Math.random() * 255);
-						context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
-						context.fillRect(i, j, 1, 1);
-					}
-				}
+		// 		for( var i = 0; i < width; i++ ){
+		// 			for( var j = 0; j < height; j++ ){
+		// 				var val = Math.floor(Math.random() * 255);
+		// 				context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
+		// 				context.fillRect(i, j, 1, 1);
+		// 			}
+		// 		}
 
-				el.style.background = "url(" + canvas.toDataURL("image/png") + ")";
-			}
+		// 		el.style.background = "url(" + canvas.toDataURL("image/png") + ")";
+		// 	}
 
-			setNoiseBackground(document.getElementsByTagName('body')[0], 50, 50, 0.02);
-		}, false );
+		// 	setNoiseBackground(document.getElementsByTagName('body')[0], 50, 50, 0.02);
+		// }, false );
 	</script>
 
 
 
 	<!-- Parallax -->
 	<script>
-		(function (){
-			var x, y, reqAnimFrame = window.requestAnimationFrame || function (fn){ setTimeout(fn, 1000/60); };
+		// (function (){
+		// 	var x, y, reqAnimFrame = window.requestAnimationFrame || function (fn){ setTimeout(fn, 1000/60); };
 
-			var items = [].slice.call(document.querySelectorAll('.layer')).map(function (el){
-				var rect = el.getBoundingClientRect();
-				el.x = rect.left;
-				el.y = rect.top;
-				el.w = rect.right - rect.left;
-				el.h = rect.bottom - rect.top;
-				el.fX = el.getAttribute('data-force-x') || el.getAttribute('data-force') || 10;
-				el.fY = el.getAttribute('data-force-y') || el.getAttribute('data-force') || 10;
-				return el;
-			});
-
-
-			document.addEventListener('dragover', function (evt){
-				x = evt.clientX;
-				y = evt.clientY;
-			}, false);
+		// 	var items = [].slice.call(document.querySelectorAll('.layer')).map(function (el){
+		// 		var rect = el.getBoundingClientRect();
+		// 		el.x = rect.left;
+		// 		el.y = rect.top;
+		// 		el.w = rect.right - rect.left;
+		// 		el.h = rect.bottom - rect.top;
+		// 		el.fX = el.getAttribute('data-force-x') || el.getAttribute('data-force') || 10;
+		// 		el.fY = el.getAttribute('data-force-y') || el.getAttribute('data-force') || 10;
+		// 		return el;
+		// 	});
 
 
-			document.addEventListener('mousemove', function (evt){
-				x = evt.clientX;
-				y = evt.clientY;
-			}, false);
+		// 	document.addEventListener('dragover', function (evt){
+		// 		x = evt.clientX;
+		// 		y = evt.clientY;
+		// 	}, false);
 
 
-			(function _loop(){
-				if( x && y ){
-					var winWidth = window.innerWidth;
-					var winHeight = window.innerHeight;
-					var halfWidth = winWidth / 2;
-					var halfHeight = winHeight / 2;
+		// 	document.addEventListener('mousemove', function (evt){
+		// 		x = evt.clientX;
+		// 		y = evt.clientY;
+		// 	}, false);
 
-					var rx = x - winWidth/2;
-					var ry = winHeight/2 - y;
 
-					items.forEach(function (el){
-						var dx = el.w/el.fX * (rx / -halfWidth);
-						var dy = el.h/el.fY * (ry / halfHeight);
-						el.style['transform'] =
-						el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
-					});
-				}
+		// 	(function _loop(){
+		// 		if( x && y ){
+		// 			var winWidth = window.innerWidth;
+		// 			var winHeight = window.innerHeight;
+		// 			var halfWidth = winWidth / 2;
+		// 			var halfHeight = winHeight / 2;
 
-				reqAnimFrame(_loop);
-			})();
-		})();
+		// 			var rx = x - winWidth/2;
+		// 			var ry = winHeight/2 - y;
+
+		// 			items.forEach(function (el){
+		// 				var dx = el.w/el.fX * (rx / -halfWidth);
+		// 				var dy = el.h/el.fY * (ry / halfHeight);
+		// 				el.style['transform'] =
+		// 				el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
+		// 			});
+		// 		}
+
+		// 		reqAnimFrame(_loop);
+		// 	})();
+		// })();
 	</script>
 
 
