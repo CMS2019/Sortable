@@ -17,3 +17,10 @@
 _onDragStart开始
 	dragEl = target;  定位真正的
 
+
+在原始sortable中拖拽过程中的元素不会被删掉,而vue.drage中的就会被删掉.后面被vue 的实例接管
+
+vue.dragon是利用vue组件抽象了一层,先使用原生dom方式操作排序,当drop时,sortable.js触发onDragAdd,先删除拖拽过程中生成的节点,然后利用vue的mvvm修改list重新渲染.
+
+所有的add这些事件,都是自定义事件,在onDrop阶段
+rootEl.dispatchEvent(_createEvent('remove', dragEl));手动触发.

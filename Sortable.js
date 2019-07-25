@@ -150,7 +150,7 @@
 				_on(this.el, 'dragstart', this._onDragStart);
 				_on(this.el, 'dragend', this._onDrop);
 
-				 
+				//  ,相当于文档一直作为拖拽接收方
 				_on(document, 'dragover', _globalDragOver); //应该是事件冒泡到文档捕捉了这个事件,
 
 
